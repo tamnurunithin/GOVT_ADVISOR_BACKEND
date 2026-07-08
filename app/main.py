@@ -8,12 +8,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS Configuration
+# Allowed Frontend Origins
 origins = [
     "http://localhost:5173",
     "https://govt-advisor-frontend.vercel.app",
 ]
 
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
