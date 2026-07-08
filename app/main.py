@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,9 +9,14 @@ app = FastAPI(
 )
 
 # CORS Configuration
+origins = [
+    "http://localhost:5173",
+    "https://govt-advisor-frontend.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -20,6 +24,7 @@ app.add_middleware(
 
 # Register API Routes
 app.include_router(chat_router)
+
 
 @app.get("/")
 def root():
