@@ -8,13 +8,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allowed Frontend Origins
+# Allowed Frontend Origins (Local Development)
 origins = [
     "http://localhost:5173",
-    "https://govt-advisor-frontend.vercel.app",
+    "http://127.0.0.1:5173",
 ]
 
-# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -23,7 +22,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register API Routes
 app.include_router(chat_router)
 
 

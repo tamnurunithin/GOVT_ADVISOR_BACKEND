@@ -14,6 +14,7 @@ VECTOR_DB_DIR = BASE_DIR / "vector_db"
 
 # API Keys
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Ensure directories exist
 DATA_DIR.mkdir(exist_ok=True)

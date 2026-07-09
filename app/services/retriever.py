@@ -1,21 +1,19 @@
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
 
 from app.core.config import VECTOR_DB_DIR
+from app.services.gemini_embeddings import GeminiEmbeddings
 
 
 def load_embeddings():
     """
-    Load the same embedding model used during ingestion.
+    Load the Gemini embedding model.
     """
 
-    print("🔄 Loading embedding model...")
+    print("🔄 Loading Gemini embedding model...")
 
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
+    embeddings = GeminiEmbeddings()
 
-    print("✅ Embedding model loaded.")
+    print("✅ Gemini embedding model loaded.")
 
     return embeddings
 
@@ -32,7 +30,7 @@ def load_vector_store():
     vector_store = FAISS.load_local(
         folder_path=str(VECTOR_DB_DIR),
         embeddings=embeddings,
-        allow_dangerous_deserialization=True
+        allow_dangerous_deserialization=True,
     )
 
     print("✅ FAISS vector database loaded.")
@@ -51,7 +49,7 @@ def retrieve_documents(question):
 
     documents = vector_store.similarity_search(
         query=question,
-        k=6
+        k=6,
     )
 
     print(f"✅ Retrieved {len(documents)} relevant chunks.")

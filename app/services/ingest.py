@@ -1,9 +1,9 @@
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app.core.config import DATA_DIR, VECTOR_DB_DIR
+from app.services.gemini_embeddings import GeminiEmbeddings
 
 
 def load_documents():
@@ -13,7 +13,6 @@ def load_documents():
 
     documents = []
 
-    # Find all PDF files in the data folder
     pdf_files = sorted(DATA_DIR.glob("*.pdf"))
 
     if not pdf_files:
@@ -28,7 +27,7 @@ def load_documents():
         loader = PyPDFLoader(str(pdf))
         docs = loader.load()
 
-        # Save filename in metadata (useful for source citations later)
+        # Store filename in metadata
         for doc in docs:
             doc.metadata["source_file"] = pdf.name
 
@@ -41,7 +40,7 @@ def load_documents():
 
 def split_documents(documents):
     """
-    Split PDF pages into smaller text chunks.
+    Split PDF pages into chunks.
     """
 
     text_splitter = RecursiveCharacterTextSplitter(
@@ -58,16 +57,14 @@ def split_documents(documents):
 
 def create_embeddings():
     """
-    Load the embedding model.
+    Load Gemini Embeddings.
     """
 
-    print("\n🔄 Loading embedding model...")
+    print("\n🔄 Loading Gemini Embedding model...")
 
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
+    embeddings = GeminiEmbeddings()
 
-    print("✅ Embedding model loaded successfully.")
+    print("✅ Gemini Embedding model ready.")
 
     return embeddings
 
@@ -81,13 +78,12 @@ def create_vector_store(chunks, embeddings):
 
     vector_store = FAISS.from_documents(
         documents=chunks,
-        embedding=embeddings
+        embedding=embeddings,
     )
 
-    # Save FAISS using configured directory
     vector_store.save_local(str(VECTOR_DB_DIR))
 
-    print(f"✅ FAISS vector database saved to: {VECTOR_DB_DIR}")
+    print(f"✅ FAISS vector database saved to:\n{VECTOR_DB_DIR}")
 
     return vector_store
 
@@ -96,26 +92,22 @@ if __name__ == "__main__":
 
     print("\n========== AI Government Scheme Advisor ==========\n")
 
-    # Step 1: Load PDF documents
     documents = load_documents()
 
     if not documents:
         exit()
 
-    # Step 2: Split documents into chunks
     chunks = split_documents(documents)
 
-    # Step 3: Load embedding model
     embeddings = create_embeddings()
 
-    # Step 4: Create and save FAISS vector database
     create_vector_store(
-        chunks,
-        embeddings
+        chunks=chunks,
+        embeddings=embeddings,
     )
 
-    # Preview first chunk
     print("\n========== First Chunk ==========\n")
+
     print(chunks[0].page_content)
 
-    print("\n=================================")
+    print("\n=================================\n")
